@@ -1,45 +1,59 @@
-'CR300 Series Datalogger
+'CR300/CR310
 
-'For programming tips, copy this address to your browser
-'search window:https://www.campbellsci.com/videos/datalogger-programming
-'To create a different opening program template, type in new
-'instructions and select Template | Save as Default Template
-'Date:
-'Program author:
+Public BattV
+Public PTemp_C
 
-'Declare Constants
-'Example:
-'CONST PI = 3.141592654 or Const PI = 4*ATN(1)
+Const MicroCatPort = Com1
 
-'Declare Public Variables
-'Example:
-Public PTemp, Batt_volt
+'Variables for MicroCAT output format 1
+Public MicroCATValue(5)
+Alias MicroCATValue(1) = Temperature
+Alias MicroCATValue(2) = Conductivity
+Alias MicroCATValue(3) = Pressure
+Alias MicroCATValue(4) = Salinity
+Alias MicroCATValue(5) = SoundVelocity
 
-'Declare Private Variables
-'Example:
-'Dim Counter
+Units Temperature = C
+Units Conductivity = S/m
+Units Pressure = decibars
+Units Salinity = psu
+Units SoundVelocity = m/s
+
+Dim responseString As String * 128
 
 'Define Data Tables.
 DataTable (Test,1,-1) 'Set table size to # of records, or -1 to autoallocate.
-	DataInterval (0,15,Sec,10)
-	Minimum (1,Batt_volt,FP2,False,False)
-	Sample (1,PTemp,FP2)
+  DataInterval (0,60,Sec,10)
+  Minimum (1,BattV,FP2,0,False)
+  Sample (1,PTemp_C,FP2)
+  Sample (5,MicroCATValue(),IEEE4)
 EndTable
 
-'Define Subroutines
-'Sub
-	'EnterSub instructions here
-'EndSub
 
 'Main Program
 BeginProg
-	Scan (1,Sec,0,0)
-		PanelTemp (PTemp,60)
-		Battery (Batt_volt)
-		'Enter other measurement instructions
-		'Call Output Tables
-		'Example:
-		CallTable Test
-	NextScan
+  SerialOpen (MicroCatPort,9600,0,0,256)
+  Scan (1,Sec,0,0)
+    PanelTemp (PTemp_C,60)
+    Battery (BattV)
+    'Enter other measurement instructions
+    'Call Output Tables
+    'Example:
+    CallTable Test
+  NextScan
+  SlowSequence
+  Scan (1,Sec,3,0)
+    SerialFlush (MicroCatPort)
+    'I have had customers need send send carriage returns first to wake up the MicroCAT
+    SerialOut (MicroCatPort,"TS" & CHR(13) & CHR(10),"",0,0) 'Trigger a sample and output
+    SerialIn (responseString,MicroCatPort,600,13,128) 'Read in response, it takes about 3 seconds for the MicroCAT to begin sending the response
+    If Len(responseString > 10) Then
+      Erase(MicroCATValue())
+      SplitStr (MicroCATValue(),responseString,"",5,0)
+    Else
+      Move (MicroCATValue(),5,NAN,1)
+    EndIf
+    SerialOut (MicroCatPort,"QS" & CHR(13) & CHR(10),"",0,0) 'Put back to sleep
+  NextScan
 EndProg
 
