@@ -20,8 +20,8 @@ Public cellquality As Float
 Dim adress As String = "200.132.216.21" 'IP_ADDRES:PORT
 Dim username As String = "tide_ssn5"
 Dim password As String = "b16045b0"
-Dim datalogger_filename As String =  "FTP_TEST"
-Dim csv_filename As String = "/tide_snn5/ftp_test.csv"
+Dim datalogger_filename As String =  "FTPTest"
+Dim csv_filename As String = "tide_snn5/ftp_test.csv"
 
 Public loggerID As String * 20
 StationName = PR1CR300
@@ -63,7 +63,7 @@ BeginProg
   Do
     Delay(1,10,sec)
     'cria o arquivo ftp_test.csv e append data a cada 5 min
-    FTPResult = FTPClient(adress,username,password,datalogger_filename,csv_filename,9,0,5,min,-1008) 
+    FTPResult = FTPClient(adress,username,password,datalogger_filename,csv_filename,9,0,1,min,-1008) 
     'FTPRescult =-1 se ok e =0 se falha e -2 se nao aconteceu
     'PutGetOption (Send or Receive a File) = 9 means: Append data to end of file, passive mode (creates a file if it does not already exist)
     'NumRecs/TimeIntoInterval (Time into Interval to Write the Number of Records = 0 means All new (unsent) data in the data table is sent.
