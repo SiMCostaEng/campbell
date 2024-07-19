@@ -2,7 +2,7 @@ import machine
 from machine import UART
 
 # Inicialização do módulo para leitura do campbell_device
-campbell_device = UART(2, baudrate=115200, rx=18, tx=19)
+campbell_device = UART(1, baudrate=115200, rx=18, tx=23)
 
 def read_until(sinal_fim):
     counter = 0
@@ -20,8 +20,7 @@ def read_until(sinal_fim):
                     # print(recebido_2, end='')
                     mensagem += recebido_2
             except:
-                print("Erro decoding")
-                print("\n\n")
+                print(f"Erro decoding: {recebido}")
     return(mensagem)
 
 def write(message):
