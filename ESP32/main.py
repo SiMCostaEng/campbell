@@ -5,6 +5,8 @@ from machine import Pin
 UART_3v3 = Pin(5, Pin.OUT, value=1)
 print("Comecou")
 
+FTP.reset()
+FTP_OK = False
 FTP_OK = FTP.init(False)
 if FTP_OK:
     FTP.write("CR800.csv", "Comecou\n", True)
@@ -16,3 +18,4 @@ while True:
     if FTP_OK:
         contador += 1
         FTP.write("CR800.csv", str(contador) + " ; " + recebido_campbell, False)
+        recebido_campbell = ""

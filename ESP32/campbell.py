@@ -2,7 +2,7 @@ import machine
 from machine import UART
 
 # Inicialização do módulo para leitura do campbell_device
-campbell_device = UART(1, baudrate=115200, rx=18, tx=23)
+campbell_device = UART(1, baudrate=115200, rx=25, tx=33)
 
 def read_until(sinal_fim):
     counter = 0

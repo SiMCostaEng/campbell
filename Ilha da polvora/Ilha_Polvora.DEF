@@ -1,0 +1,89 @@
+8/5/2024
+10:29:27
+Created by Short Cut (4.4)
+Short Cut Program:  Ilha_Polvora.DEF
+
+-Wiring for CR800 Series-
+
+  CS215
+    G:  White
+    G:  Black
+    G:  Clear
+    12V:  Red
+    C1:  Green
+
+  CS300
+    1H:  Red
+    Ground:  Black
+    Ground:  Clear
+
+  TE525MM/TE525M
+    Ground:  Clear
+    Ground:  White
+    P1:  Black
+
+  03002
+    1L:  Green
+    Ground:  Black
+    Ground:  Clear
+    Ground:  White
+    VX1 or EX1:  Blue
+    P2:  Red
+
+-Measurement Labels-
+
+  Default
+    BattV
+    PTemp_C
+
+  CS215
+    AirTC
+    RH
+
+  CS300
+    SlrW
+    SlrMJ
+
+  TE525MM/TE525M
+    Rain_mm
+
+  03002
+    WS_ms
+    WindDir
+
+----------------------------------------------------
+Table: Table1
+Interval: 5 SEC
+Fields:
+ BattV_Avg	Units: Volts
+ PTemp_C_Avg	Units: Deg C
+ AirTC_Avg	Units: Deg C
+ RH	Units: %
+ SlrW_Avg	Units: W/m^2
+ Rain_mm_Tot	Units: mm
+ WS_ms	Units: meters/second
+ WindDir	Units: degrees
+
+----------------------------------------------------
+Table: DataTableInfo
+Fields:
+ DataTableName(1)
+ SkippedRecord
+ DataRecordSize	Units: records
+ SecsPerRecord
+ DataFillDays	Units: days
+ DataFilled(1,1)
+
+----------------------------------------------------
+Table: Public
+Fields:
+ BattV	Units: Volts
+ PTemp_C	Units: Deg C
+ AirTC	Units: Deg C
+ RH	Units: %
+ SlrW	Units: W/m^2
+ SlrMJ	Units: MJ/m^2
+ Rain_mm	Units: mm
+ WS_ms	Units: meters/second
+ WindDir	Units: degrees
+

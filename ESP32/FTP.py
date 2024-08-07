@@ -11,10 +11,11 @@ FTP_IP = '200.132.216.21'
 FTP_PORT = 21
 FTP_USER = 'datalogger_0'
 FTP_PASS = 'd4t4fl0w$'
+# FTP_APN = 'zap.vivo.com.br'
 FTP_APN = 'java.claro.com.br'
 
 # Constantes de Tempo
-RETRY_MAX_COUNTER = 5
+RETRY_MAX_COUNTER = 10
 WAIT_TIME = 0.5
 
 # Flag de modo de depuração
@@ -59,25 +60,25 @@ def sendAT(command, expected_response=""):
     global debug
     if expected_response:
         if debug:
-            print(f'{command}')
+            print(f'\n\tComand send: {command}')
         for _ in range(RETRY_MAX_COUNTER):
             SIM800.write(f'{command}\r\n')
             for _ in range(RETRY_MAX_COUNTER):
                 response = SIM800.read()
                 if response is not None:
+                    response = response.decode('utf-8').strip()
                     if debug:
-                        print(f'\t{response}')
-                    response = response.decode('utf-8')
+                        print(f'{response}\n')
                     if expected_response in response:
-                        return True
+                        return True, response
                 time.sleep(WAIT_TIME)
-        return False
+        return False, None
     else:
         SIM800.write(command, len(command))
-        if debug:
-            print(command)
+        # if debug:
+        #     print(command)
         time.sleep(WAIT_TIME)
-        return True
+        return True, None
 
 def sendAT_read(command, contagem_max):
     """
@@ -116,9 +117,10 @@ def init(debug_mode):
     :param debug_mode: Modo de depuração. Se True, exibe mensagens de depuração.
     :return: True se a inicialização for bem-sucedida, False caso contrário.
     """
-    print("FTP init")
     global debug
     debug = debug_mode
+    if not debug:
+        print("FTP init")
     commands = [
         ("AT", "OK"),
         ("AT+CREG?", "OK"),
@@ -135,7 +137,8 @@ def init(debug_mode):
         (f"AT+FTPPW=\"{FTP_PASS}\"", "OK")
     ]
     for cmd, response in commands:
-        if not sendAT(cmd, response):
+        send_return, received_message = sendAT(cmd, response)
+        if not send_return:
             print(f'\t\tFalha ao executar comando {cmd}')
             return False
     return True
@@ -149,10 +152,12 @@ def write(filename, data, create):
     :param create: Se True, cria um novo arquivo; se False, faz append no arquivo existente.
     :return: True se a operação for bem-sucedida, False caso contrário.
     """
+    global debug
     global write_initiated
     if not(write_initiated):
         if create:
-            print(f"FTP create file:\t{filename}")
+            if not debug:
+                print(f"FTP create file:\t{filename}")
 
             commands = [
                 (f'AT+FTPPUTNAME="{filename}"', "OK"),
@@ -160,7 +165,8 @@ def write(filename, data, create):
                 ("AT+FTPPUT=1", "OK")
             ]
         else:
-            print(f"FTP write file:\t{filename}")
+            if not debug:
+                print(f"FTP write file:\t{filename}")
 
             commands = [
                 ("AT+FTPPUTOPT=APPE", "OK"),  # Comando para fazer o append no arquivo ou não
@@ -170,7 +176,8 @@ def write(filename, data, create):
             ]
 
         for cmd, response in commands:
-            if not sendAT(cmd, response):
+            send_return, received_message = sendAT(cmd, response)
+            if not send_return:
                 print(f'\t\tFalha ao executar comando {cmd}')
                 return False
         
@@ -198,7 +205,9 @@ def reset():
 
     Realiza uma reinicialização do módulo FTP.
     """
-    print("FTP reset\n")
+    global debug
+    if not debug:
+        print("FTP reset\n")
     
     global write_initiated
     if write_initiated:
@@ -215,9 +224,11 @@ def read(filename):
     Lê um arquivo remoto via FTP.
 
     :param filename: Nome do arquivo remoto a ser lido.
-    :return: True se a operação for bem-sucedida, False caso contrário.
+    :return: Texto lido caso a operação tenha sido bem-sucedida, e vazio caso contrário.
     """
-    print("FTP read file")
+    global debug
+    if not debug:
+        print("FTP read file")
 
     commands = [
         (f'AT+FTPGETNAME="{filename}"', "OK"),
@@ -225,12 +236,54 @@ def read(filename):
         ("AT+FTPGET=1", "1,1")
     ]
     for cmd, response in commands:
-        if not sendAT(cmd, response):
+        send_return, received_message = sendAT(cmd, response)
+        if not send_return:
             print(f'\t\tFalha ao executar comando {cmd}')
-            return False
+            return ""
 
     fail_check, comandos_recebidos = sendAT_read("AT+FTPGET=2,", 30)
     if not fail_check or len(comandos_recebidos) == 0:
         fail_check, comandos_recebidos = sendAT_read("AT+FTPGET=2,", 30)
 
-    return True
+    return comandos_recebidos
+
+def check_conections():
+    commands = [
+    ("AT", "OK"),       # AT Test Command
+    ("AT+CSQ", "OK"),   # Network signal quality query, returns a signal value
+    ("AT+CREG?", "OK"), # Request network registration status
+    ("AT+CGMR", "OK"),  # Request firmware version
+    # ("AT+CGATT", "OK")  # Check for GPRS attachment service status
+    ]
+    FTP_states = [""] * len(commands)
+    
+    for index, (cmd, response) in enumerate(commands):
+        send_return, received_message = sendAT(cmd, response)
+        if not send_return:
+            print(f'\t\tFalha ao executar comando {cmd}')
+        else:
+            if index == 1:
+                response_str = received_message.decode() if isinstance(received_message, bytes) else received_message
+                start_index = response_str.find('+CSQ: ') + len('+CSQ: ')
+                end_index = response_str.find('\r', start_index)
+                numbers_str = response_str[start_index:end_index]
+            elif index == 2:
+                response_str = received_message.decode() if isinstance(received_message, bytes) else received_message
+                start_index = response_str.find('+CREG: ') + len('+CREG: ')
+                end_index = response_str.find('\r', start_index)
+                numbers_str = response_str[start_index:end_index]
+            elif index == 3:
+                response_str = received_message.decode() if isinstance(received_message, bytes) else received_message
+                start_index = response_str.find('Revision:') + len('Revision:')
+                end_index = response_str.find('\r', start_index)
+                numbers_str = response_str[start_index:end_index]
+            else:
+                numbers_str = response
+            FTP_states[index] = numbers_str
+    
+    FTP_states[0] = '{:>2}'.format(FTP_states[0])
+    FTP_states[1] = '{:>5}'.format(FTP_states[1])
+    FTP_states[2] = '{:>5}'.format(FTP_states[2])
+    FTP_states[3] = '{:>20}'.format(FTP_states[3])
+    
+    return FTP_states
