@@ -21,6 +21,8 @@ def read_until(sinal_fim):
                     mensagem += recebido_2
             except:
                 print(f"Erro decoding: {recebido}")
+                
+    print(f"Recebido:\t\t{mensagem}")
     return(mensagem)
 
 def write(message):

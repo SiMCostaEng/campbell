@@ -18,9 +18,9 @@
       <string>8,WS_ms,0,0,0,0</string>
       <string>9,WindDir,0,0,0,0</string>
     </inlocstringlist>
-    <Modified>True</Modified>
+    <Modified>False</Modified>
     <storagerates>
-      <string>5</string>
+      <string>60</string>
     </storagerates>
     <storageunits>
       <string>Seconds</string>
@@ -30,8 +30,8 @@
         <Ad_RecordCount>-1</Ad_RecordCount>
         <Ad_Time>True</Ad_Time>
         <Ad_TimeValue>0</Ad_TimeValue>
-        <Ad_TimeUnits>5</Ad_TimeUnits>
-        <Ad_TimeInterval>5</Ad_TimeInterval>
+        <Ad_TimeUnits>60</Ad_TimeUnits>
+        <Ad_TimeInterval>60</Ad_TimeInterval>
         <Ad_FlagsPorts>False</Ad_FlagsPorts>
         <Ad_FlagOrPortIndex>0</Ad_FlagOrPortIndex>
         <Ad_HighLow>0</Ad_HighLow>
@@ -50,13 +50,13 @@
       </advancedoutput>
     </advancedoutputs>
     <crbasicprogram>
-      <FileName>C:\Users\mathe\OneDrive\Desktop\campbell\Ilha da polvora\Ilha_Polvora.DLD</FileName>
+      <FileName>C:\Users\mathe\OneDrive\Desktop\campbell\Ilha da polvora\Ilha_Polvora.CR8</FileName>
       <measurementinstructions>
         <string></string>
         <string>'Main Program</string>
         <string>BeginProg</string>
         <string>	'Main Scan</string>
-        <string>	Scan(1,Sec,1,0)</string>
+        <string>	Scan(6,Sec,1,0)</string>
         <string>		'Default CR800 Datalogger Battery Voltage measurement 'BattV'</string>
         <string>		Battery(BattV)</string>
         <string>		'Default CR800 Datalogger Wiring Panel Temperature measurement 'PTemp_C'</string>
@@ -68,10 +68,10 @@
         <string>		If SlrW&lt;0 Then SlrW=0</string>
         <string>		'Calculate total flux</string>
         <string>		'The multiplier to calculate total flux was calculated by Short Cut</string>
-        <string>		'and based on a program execution rate (scan rate) of 1 Seconds.</string>
+        <string>		'and based on a program execution rate (scan rate) of 6 Seconds.</string>
         <string>		'If you change the program execution rate outside of Short Cut with the CRBasic Editor</string>
         <string>		'you will need to recalculate this multiplier. See the sensor manual for more details.</string>
-        <string>		SlrMJ=SlrW*5E-06</string>
+        <string>		SlrMJ=SlrW*3E-05</string>
         <string>		'Calculate flux density</string>
         <string>		SlrW=SlrW*5</string>
         <string>		'TE525MM/TE525M Rain Gauge measurement 'Rain_mm'</string>
@@ -83,7 +83,6 @@
         <string>		If WindDir&gt;=352 Or WindDir&lt;0 Then WindDir=0</string>
         <string>		'Call Data Tables and Store Data</string>
         <string>		CallTable Table1</string>
-        <string>		CallTable Table2</string>
         <string>	NextScan</string>
         <string>EndProg</string>
       </measurementinstructions>
@@ -99,24 +98,19 @@
       </measurementlabels>
       <outputinstructions>
         <string>DataTable(Table1,True,-1)</string>
-        <string>	DataInterval(0,5,Sec,10)</string>
+        <string>	DataInterval(0,60,Sec,10)</string>
         <string>	Average(1,BattV,FP2,False)</string>
         <string>	Average(1,PTemp_C,FP2,False)</string>
         <string>	Average(1,AirTC,FP2,False)</string>
         <string>	Sample(1,RH,FP2)</string>
         <string>	Average(1,SlrW,FP2,False)</string>
         <string>	Totalize(1,Rain_mm,FP2,False)</string>
-        <string>	Sample(1,WS_ms,FP2)</string>
+        <string>	Average(1,WS_ms,FP2,False)</string>
         <string>	Sample(1,WindDir,FP2)</string>
-        <string>EndTable</string>
-        <string>DataTable(Table2,True,-1)</string>
-        <string>	DataInterval(0,1,Min,10)</string>
-        <string>	Minimum(1,BattV,FP2,False,False)</string>
         <string>EndTable</string>
       </outputinstructions>
       <tablecalls>
         <string>	CallTable Table1</string>
-        <string>	CallTable Table2</string>
       </tablecalls>
       <tablesectionstrings/>
       <tableplttomain/>
@@ -125,7 +119,7 @@
       <dataintervals>
         <crbasicdatainterval>
           <TimeToInt>0</TimeToInt>
-          <Interval>5</Interval>
+          <Interval>60</Interval>
           <Units>Seconds</Units>
           <Lapses>10</Lapses>
         </crbasicdatainterval>
@@ -139,7 +133,7 @@
       </datatables>
     </crbasicprogram>
     <idgenerator>
-      <CurrentOrdinalNumber>27</CurrentOrdinalNumber>
+      <CurrentOrdinalNumber>31</CurrentOrdinalNumber>
     </idgenerator>
     <loggerid>
       <ID>0</ID>
@@ -174,7 +168,7 @@
     <HighResolutionLabel>high</HighResolutionLabel>
     <LowResolutionLabel>low</LowResolutionLabel>
     <OutputIntervalUnits>Milliseconds,Seconds,Minutes,Hours,Day</OutputIntervalUnits>
-    <ScanRate>1</ScanRate>
+    <ScanRate>6</ScanRate>
     <ScanUnits>Milliseconds,Seconds,Minutes</ScanUnits>
     <ScanUnitsIndex>1</ScanUnitsIndex>
     <SupportsStar4>False</SupportsStar4>
@@ -1924,7 +1918,7 @@
             <HelpContext>0</HelpContext>
             <TypeTag>0</TypeTag>
             <ValidOutPuts></ValidOutPuts>
-            <Value>5E-06</Value>
+            <Value>3E-05</Value>
             <Units></Units>
             <UnitsIndex>0</UnitsIndex>
             <ActiveUnits></ActiveUnits>
@@ -2406,21 +2400,21 @@
         <outputs>
           <output>
             <CanEdit>True</CanEdit>
-            <FileName>sample.out</FileName>
-            <FileVersion>1.14</FileVersion>
-            <HelpContext>50200</HelpContext>
+            <FileName>average.out</FileName>
+            <FileVersion>1.12</FileVersion>
+            <HelpContext>50100</HelpContext>
             <HelpFile>scwin.chm</HelpFile>
             <ImageFilename></ImageFilename>
-            <LongName>Sample</LongName>
+            <LongName>Average</LongName>
             <ShortCutVersion>3.2</ShortCutVersion>
-            <ShortName>Sample</ShortName>
+            <ShortName>Average</ShortName>
             <Automatic>False</Automatic>
             <IsDefaultOutput>False</IsDefaultOutput>
             <Measurement>WS_ms</Measurement>
-            <OutputID>21</OutputID>
-            <OutputFileVersion>1.14</OutputFileVersion>
+            <OutputID>28</OutputID>
+            <OutputFileVersion>1.12</OutputFileVersion>
             <outputlabels>
-              <string>WS_ms</string>
+              <string>WS_ms_AVG</string>
             </outputlabels>
             <parentAttributeHandle>WS</parentAttributeHandle>
             <ParentSensorID>0</ParentSensorID>
@@ -2442,7 +2436,7 @@
             <Automatic>False</Automatic>
             <IsDefaultOutput>False</IsDefaultOutput>
             <Measurement>WindDir</Measurement>
-            <OutputID>22</OutputID>
+            <OutputID>29</OutputID>
             <OutputFileVersion>1.14</OutputFileVersion>
             <outputlabels>
               <string>WindDir</string>

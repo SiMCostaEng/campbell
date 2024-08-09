@@ -9,8 +9,8 @@ FTP_Reset = Pin(15, Pin.OUT, value=1)
 # Constantes de Configuração FTP
 FTP_IP = '200.132.216.21'
 FTP_PORT = 21
-FTP_USER = 'datalogger_0'
-FTP_PASS = 'd4t4fl0w$'
+FTP_USER = 'met_marisma'
+FTP_PASS = 'd1A$0t81'
 # FTP_APN = 'zap.vivo.com.br'
 FTP_APN = 'java.claro.com.br'
 

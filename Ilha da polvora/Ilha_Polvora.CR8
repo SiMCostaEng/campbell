@@ -27,14 +27,14 @@ Units RH=%
 
 'Define Data Tables
 DataTable(Table1,True,-1)
-	DataInterval(0,5,Sec,10)
+	DataInterval(0,60,Sec,10)
 	Average(1,BattV,FP2,False)
 	Average(1,PTemp_C,FP2,False)
 	Average(1,AirTC,FP2,False)
 	Sample(1,RH,FP2)
 	Average(1,SlrW,FP2,False)
 	Totalize(1,Rain_mm,FP2,False)
-	Sample(1,WS_ms,FP2)
+	Average(1,WS_ms,FP2,False)
 	Sample(1,WindDir,FP2)
 EndTable
 
@@ -45,7 +45,7 @@ BeginProg
   SerialOpen (COMRS232,115200,0,0,256)
   SerialOpen (ESPCom,115200,0,0,256)
 	'Main Scan
-	Scan(1,Sec,1,0)
+	Scan(6,Sec,1,0)
 		'Default CR800 Datalogger Battery Voltage measurement 'BattV'
 		Battery(BattV)
 		'Default CR800 Datalogger Wiring Panel Temperature measurement 'PTemp_C'
@@ -57,10 +57,10 @@ BeginProg
 		If SlrW<0 Then SlrW=0
 		'Calculate total flux
 		'The multiplier to calculate total flux was calculated by Short Cut
-		'and based on a program execution rate (scan rate) of 1 Seconds.
+		'and based on a program execution rate (scan rate) of 6 Seconds.
 		'If you change the program execution rate outside of Short Cut with the CRBasic Editor
 		'you will need to recalculate this multiplier. See the sensor manual for more details.
-		SlrMJ=SlrW*5E-06
+		SlrMJ=SlrW*3E-05
 		'Calculate flux density
 		SlrW=SlrW*5
 		'TE525MM/TE525M Rain Gauge measurement 'Rain_mm'
@@ -76,15 +76,11 @@ BeginProg
 	
   SlowSequence
   Do
-    Delay(1,5,Sec)
-    OutString = "CR800 Batt: " + BattV + ";  Temp : " + PTemp_C + ";   "
-		OutString = OutString + "CS215 Temp: " + TRHData(1) +", ReHu: " + TRHData(2) + ";   "
-		OutString = OutString + "CS300 SlrMJ: " + SlrMJ + ", SlrW: " + SlrW + ";   "
-		OutString = OutString + "TE525MM Rain: " + Rain_mm + ";   "
-		OutString = OutString + "03002 WS_ms: " + WS_ms + ", WindDir: " + WindDir + ";   "
-    OutString = OutString + "        \r\n"
+    Delay(1,5,Min)
+		OutString = ""
+		GetRecord (OutString,Table1,1)
 		SerialOut (COMRS232,OutString,"",0,0)
+		OutString = OutString + "\r\n"
 		SerialOut (ESPCom,OutString,"",0,0)
     Loop
 EndProg
-

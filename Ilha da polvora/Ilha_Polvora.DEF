@@ -1,5 +1,5 @@
-8/5/2024
-10:29:27
+8/9/2024
+10:15:53
 Created by Short Cut (4.4)
 Short Cut Program:  Ilha_Polvora.DEF
 
@@ -53,7 +53,7 @@ Short Cut Program:  Ilha_Polvora.DEF
 
 ----------------------------------------------------
 Table: Table1
-Interval: 5 SEC
+Interval: 60 SEC
 Fields:
  BattV_Avg	Units: Volts
  PTemp_C_Avg	Units: Deg C
@@ -61,7 +61,7 @@ Fields:
  RH	Units: %
  SlrW_Avg	Units: W/m^2
  Rain_mm_Tot	Units: mm
- WS_ms	Units: meters/second
+ WS_ms_Avg	Units: meters/second
  WindDir	Units: degrees
 
 ----------------------------------------------------
